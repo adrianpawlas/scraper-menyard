@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Output files from scraper
+test_products.json
+products_menyard.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# PyTorch / HuggingFace cache (downloaded on-demand in CI)
+.huggingface/

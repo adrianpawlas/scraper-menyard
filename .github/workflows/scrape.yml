@@ -1,0 +1,64 @@
+name: Scrape Menyard Products
+
+on:
+  # ── Scheduled: Tuesday & Friday at 3:30 AM (adjust timezone below) ──
+  # Cron is UTC. If you're in CEST (UTC+2), 3:30AM CEST = 1:30AM UTC → '30 1 * * 2,5'
+  # If you're in CET (UTC+1), 3:30AM CET = 2:30AM UTC → '30 2 * * 2,5'
+  schedule:
+    - cron: '30 3 * * 2,5'
+
+  # ── Manual trigger from GitHub UI ──
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Limit products per collection (for testing, leave empty for full run)'
+        required: false
+        type: number
+      skip_existing:
+        description: 'Skip products already in the database'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  # Use 3.13 for CI (widely available on GitHub Actions runners)
+  # Change to '3.14' if GitHub Actions supports it
+  PYTHON_VERSION: '3.13'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Cache HuggingFace models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: huggingface-menyard-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            huggingface-menyard-${{ runner.os }}-
+
+      - name: Run scraper pipeline
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python main.py \
+            ${{ github.event.inputs.limit && format('--limit {0}', github.event.inputs.limit) || '' }} \
+            ${{ github.event.inputs.skip_existing == 'false' && '--all' || '' }}
