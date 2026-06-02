@@ -247,7 +247,9 @@ class MenyardScraper:
 
         # --- Images (filtered) ---
         images = product.get("images", [])
-        main_image, additional_images = filter_product_images(images)
+        main_image, additional_images = filter_product_images(
+            images, product_title=title,
+        )
         additional_images_str = (
             " , ".join(additional_images) if additional_images else None
         )
