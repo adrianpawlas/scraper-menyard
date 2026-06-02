@@ -27,7 +27,6 @@ from config import (
     BRAND,
     GENDER,
     SECOND_HAND,
-    COUNTRY,
 )
 from image_utils import filter_product_images
 
@@ -302,7 +301,7 @@ class MenyardScraper:
             "size": sizes,
             "second_hand": SECOND_HAND,
             "image_embedding": None,
-            "country": COUNTRY,
+            "country": None,
             "compressed_image_url": None,
             "tags": tag_list,
             "search_vector": None,
