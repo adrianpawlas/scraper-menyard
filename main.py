@@ -139,14 +139,14 @@ def run_pipeline(
     # Text embeddings (for ALL new + changed products)
     if (new_products or changed_products) and embedder:
         texts_for_embed = []
-        text_product_refs = []  # (list_ref, index) pairs
+        text_product_refs = []  # (list_ref, index_in_that_list) pairs
 
-        for p in new_products:
+        for idx, p in enumerate(new_products):
             texts_for_embed.append(p.get("_info_text", ""))
-            text_product_refs.append((new_products, len(texts_for_embed) - 1))
-        for p in changed_products:
+            text_product_refs.append((new_products, idx))
+        for idx, p in enumerate(changed_products):
             texts_for_embed.append(p.get("_info_text", ""))
-            text_product_refs.append((changed_products, len(texts_for_embed) - 1))
+            text_product_refs.append((changed_products, idx))
 
         if texts_for_embed:
             logger.info(
